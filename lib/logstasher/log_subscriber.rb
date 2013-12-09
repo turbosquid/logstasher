@@ -77,12 +77,9 @@ module LogStasher
 
     # Monkey patching to enable exception logging
     def extract_exception(payload)
-      if payload[:exception]
-        exception, message = payload[:exception]
-        { :status => 500, exception: exception, message: message, backtrace: $!.backtrace }
-      else
-        {}
-      end
+      return {} unless payload[:exception]
+      exception, message = payload[:exception]
+      { status: 500, exception: exception, message: message, backtrace: $!.backtrace }
     end
 
     def extract_custom_fields(payload)
