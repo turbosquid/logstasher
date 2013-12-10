@@ -19,7 +19,7 @@ module LogStasher
       hash = {
         '@timestamp' => datetime.iso8601,
         '@fields' => {
-          'request_id' => Thread.current[:app_request_uuid],
+          'request_id' => Rails.application.current_request_uuid,
           'level' => severity
         },
         '@tags' => []
