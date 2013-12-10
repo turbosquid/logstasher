@@ -17,7 +17,6 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
-  s.add_dependency "logger"
   s.add_runtime_dependency "logstash-event", ["~> 1.1.0"]
 
   # specify any dependencies here; for example:
