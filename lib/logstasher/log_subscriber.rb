@@ -15,12 +15,7 @@ module LogStasher
 
       data[:tags] = ['request']
 
-      if payload[:exception]
-        data[:tags] << 'exception'
-        severity = :error
-      else
-        severity = :info
-      end
+      severity = payload[:exception] ? :error : :info
 
       LogStasher.logger.send(severity, data)
     end
