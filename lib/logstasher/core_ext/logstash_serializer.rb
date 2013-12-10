@@ -8,14 +8,13 @@ end
 
 class Exception
   def to_logstash
-    hash = {
+    {
       '@fields' => {
         'error' => self.message,
         'backtrace' => self.backtrace
       },
       '@tags' => ['error']
     }
-    hash
   end
 end
 
