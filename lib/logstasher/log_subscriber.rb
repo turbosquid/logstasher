@@ -14,9 +14,15 @@ module LogStasher
       data.merge! extract_custom_fields(payload)
 
       data[:tags] = ['request']
-      data[:tags] << 'exception' if payload[:exception]
 
-      LogStasher.logger.info(data)
+      if payload[:exception]
+        data[:tags] << 'exception'
+        severity = :error
+      else
+        severity = :info
+      end
+
+      LogStasher.logger.send(severity, data)
     end
 
     def redirect_to(event)
