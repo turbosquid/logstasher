@@ -22,10 +22,6 @@ module LogStasher
     ActionController::Base.send(:define_method, :logtasher_add_custom_fields_to_payload, &block)
   end
 
-  def self.set_logger(obj)
-    self.logger = obj
-  end
-
   def self.setup(app)
     # Path instrumentation class to insert our hook
     require 'logstasher/rails_ext/action_controller/metal/instrumentation'

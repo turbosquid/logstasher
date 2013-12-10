@@ -24,22 +24,28 @@ module LogStasher
         },
         '@tags' => []
       }
+
       case message
       when String
-        return hash.merge({ '@message' => message })
+        hash.merge!({ '@message' => message })
+
       when Hash
         hash['@fields'].merge!(message)
         # promote nested tags to top level
         hash['@tags'] += message[:tags] || []
-      end
-      if Exception.in?(message.class.ancestors)
+
+      when Exception
         hash['@tags'] << 'error'
-        hash['@fields'].merge!({
-          error: message.message,
-          backtrace: message.backtrace,
-          caller: message.backtrace.first
-        })
+        hash['@fields'].merge!(error: message.message, backtrace: message.backtrace)
+
+      else
+        if message.respond_to? :to_s
+          hash.merge!( '@message' => message.to_s)
+        else
+          hash.merge!( '@message' => message.inspect)
+        end
       end
+
       hash
     end
 
