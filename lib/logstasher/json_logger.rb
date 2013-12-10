@@ -19,7 +19,9 @@ module LogStasher
       hash = message.to_logstash
       hash['@timestamp'] = datetime.iso8601
       hash['@fields'] ||= {}
-      hash['@fields']['request_id'] = Rails.application.current_request_uuid
+      if Rails.application.respond_to? :current_request_uuid
+        hash['@fields']['request_id'] = Rails.application.current_request_uuid
+      end
       hash['@fields']['level'] = severity
       hash['@tags'] ||= []
       hash
