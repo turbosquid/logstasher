@@ -3,7 +3,6 @@ require 'logger'
 module LogStasher
   class JSONLogger < Logger
 
-
     def initialize(destination = STDOUT)
       super(destination)
       self.level = Logger::DEBUG
@@ -14,7 +13,6 @@ module LogStasher
         end
       end
     end
-
 
     def process_message(severity, datetime, message)
       hash = message.to_logstash
