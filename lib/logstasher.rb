@@ -26,7 +26,6 @@ module LogStasher
   def self.setup(app)
     # Path instrumentation class to insert our hook
     require 'logstasher/rails_ext/action_controller/metal/instrumentation'
-    require 'logstash-event'
     LogStasher::RequestLogSubscriber.attach_to :action_controller
     self.logger = Rails.logger
     self.enabled = true
