@@ -8,9 +8,8 @@ module LogStasher
       self.level = Logger::DEBUG
       self.formatter = proc do |severity, datetime, progname, message|
         if message.present?
-          data = process_message(severity, datetime, message)
-          event = LogStash::Event.new(data)
-          "#{event.to_json}\n"
+          event = process_message(severity, datetime, message)
+          (defined? Oj) ? "#{Oj.dump(event, mode: :compat)}\n" : "#{event.to_json}\n"
         end
       end
     end

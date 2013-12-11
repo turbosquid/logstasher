@@ -18,6 +18,12 @@ class Exception
   end
 end
 
+class String
+  def to_logstash
+    { '@message' => self.to_s }
+  end
+end
+
 class Object
   def to_logstash
     { '@message' => self.inspect }
