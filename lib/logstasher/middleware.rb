@@ -18,4 +18,6 @@ module LogStasher
       Rails.logger.current_request_uuid = nil
     end
   end
+
 end
+
