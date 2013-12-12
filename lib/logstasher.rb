@@ -5,6 +5,7 @@ require 'active_support/core_ext/module/attribute_accessors'
 require 'active_support/core_ext/string/inflections'
 require 'active_support/ordered_options'
 require 'logstasher/core_ext/logstash_serializer'
+require 'logstasher/middleware'
 
 module LogStasher
   # Logger for the logstash logs

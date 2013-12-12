@@ -3,6 +3,8 @@ require 'logger'
 module LogStasher
   class JSONLogger < Logger
 
+    attr_accessor :current_request_uuid
+
     def initialize(destination = STDOUT)
       super(destination)
       self.level = Logger::DEBUG
@@ -18,9 +20,7 @@ module LogStasher
       hash = message.to_logstash
       hash['@timestamp'] = datetime.iso8601
       hash['@fields'] ||= {}
-      if Rails.application.respond_to? :current_request_uuid
-        hash['@fields']['request_id'] = Rails.application.current_request_uuid
-      end
+      hash['@fields']['request_id'] = @current_request_uuid
       hash['@fields']['level'] = severity
       hash['@tags'] ||= []
       hash
