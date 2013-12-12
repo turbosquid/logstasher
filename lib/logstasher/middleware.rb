@@ -1,9 +1,5 @@
-#
-# Add this middleware to your rails project
-# to carry the request uuid through to various logged events
-# ex:
-# config.middleware.insert_after ActionDispatch::RequestId, LogStasher::RequestTracker
-#
+# captures the request id at the routing layer so all inbound calls
+# have the correct request id, when logged
 
 module LogStasher
   class Middleware
