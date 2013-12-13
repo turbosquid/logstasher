@@ -31,16 +31,11 @@ module LogStasher
       "#{Oj.dump(event, mode: :compat)}\n"
     end
 
-    def serialize(event)
+    def serialize_to_json(event)
       "#{event.to_json}\n"
     end
 
-    def self.define_serializer
-      method = (defined? Oj) ? :serialize_oj : :serialize
-      send(:alias_method, :serialize_event, method)
-    end
-
-    define_serializer
+    alias_method :serialize_event, defined?(Oj) ? :serialize_oj : :serialize_to_json
 
   end
 end
