@@ -16,4 +16,3 @@ module LogStasher
   end
 
 end
-
