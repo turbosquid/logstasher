@@ -6,17 +6,18 @@ module LogStasher
     def process_action(event)
       payload = event.payload
 
-      data      = extract_request(payload)
+      data = extract_request(payload)
       data.merge! extract_status(payload)
       data.merge! runtimes(event)
       data.merge! location(event)
       data.merge! extract_exception(payload)
       data.merge! extract_custom_fields(payload)
 
-      tags = ['request']
-      tags.push('exception') if payload[:exception]
-      event = LogStash::Event.new('@fields' => data, '@tags' => tags)
-      LogStasher.logger << event.to_json + "\n"
+      data[:tags] = ['request']
+
+      severity = payload[:exception] ? :error : :info
+
+      LogStasher.logger.send(severity, data)
     end
 
     def redirect_to(event)

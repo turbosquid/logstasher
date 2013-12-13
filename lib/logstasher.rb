@@ -1,34 +1,15 @@
 require 'logstasher/version'
 require 'logstasher/log_subscriber'
+require 'logstasher/json_logger'
 require 'active_support/core_ext/module/attribute_accessors'
 require 'active_support/core_ext/string/inflections'
 require 'active_support/ordered_options'
+require 'logstasher/core_ext/logstash_serializer'
+require 'logstasher/middleware'
 
 module LogStasher
   # Logger for the logstash logs
   mattr_accessor :logger, :enabled
-
-  def self.remove_existing_log_subscriptions
-    ActiveSupport::LogSubscriber.log_subscribers.each do |subscriber|
-      case subscriber
-        when ActionView::LogSubscriber
-          unsubscribe(:action_view, subscriber)
-        when ActionController::LogSubscriber
-          unsubscribe(:action_controller, subscriber)
-      end
-    end
-  end
-
-  def self.unsubscribe(component, subscriber)
-    events = subscriber.public_methods(false).reject{ |method| method.to_s == 'call' }
-    events.each do |event|
-      ActiveSupport::Notifications.notifier.listeners_for("#{event}.#{component}").each do |listener|
-        if listener.instance_variable_get('@delegate') == subscriber
-          ActiveSupport::Notifications.unsubscribe listener
-        end
-      end
-    end
-  end
 
   def self.add_default_fields_to_payload(payload, request)
     payload[:ip] = request.remote_ip
@@ -44,27 +25,14 @@ module LogStasher
   end
 
   def self.setup(app)
-    app.config.action_dispatch.rack_cache[:verbose] = false if app.config.action_dispatch.rack_cache
-    # Path instrumentation class to insert our hook
+    # patch instrumentation class to insert our hook
     require 'logstasher/rails_ext/action_controller/metal/instrumentation'
-    require 'logstash-event'
-    self.suppress_app_logs(app)
     LogStasher::RequestLogSubscriber.attach_to :action_controller
-    self.logger = app.config.logstasher.logger || Logger.new(STDOUT)
-    self.logger.level = app.config.logstasher.log_level || Logger::WARN
-    self.enabled = true
+    self.logger = Rails.logger
   end
 
-  def self.suppress_app_logs(app)
-    if configured_to_suppress_app_logs?(app)
-      require 'logstasher/rails_ext/rack/logger'
-      LogStasher.remove_existing_log_subscriptions
-    end
-  end
-
-  def self.configured_to_suppress_app_logs?(app)
-    # This supports both spellings: "suppress_app_log" and "supress_app_log"
-    !!(app.config.logstasher.suppress_app_log.nil? ? app.config.logstasher.supress_app_log : app.config.logstasher.suppress_app_log)
+  def self.log(severity, msg)
+    self.logger.send(severity, message)
   end
 
   def self.custom_fields
@@ -75,12 +43,8 @@ module LogStasher
     Thread.current[:logstasher_custom_fields] = val
   end
 
-
   def self.log(severity, msg)
-    if self.logger && self.logger.send("#{severity}?")
-      event = LogStash::Event.new('@fields' => {:message => msg, :level => severity},'@tags' => ['log'])
-      self.logger.send severity, event.to_json
-    end
+    self.logger.send(severity, event.to_json)
   end
 
   class << self

@@ -8,7 +8,10 @@ module LogStasher
     config.logstasher.enabled = false
 
     initializer :logstasher do |app|
-      LogStasher.setup(app) if app.config.logstasher.enabled
+      if app.config.logstasher.enabled
+        LogStasher.setup(app)
+        app.config.middleware.insert_after ActionDispatch::RequestId, LogStasher::Middleware
+      end
     end
   end
 end

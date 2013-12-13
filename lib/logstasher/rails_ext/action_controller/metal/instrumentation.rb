@@ -19,7 +19,7 @@ module ActionController
         LogStasher.custom_fields += after_keys - before_keys
       end
 
-      ActiveSupport::Notifications.instrument("start_processing.action_controller", raw_payload.dup)
+      ActiveSupport::Notifications.instrument("start_processing.action_controller", raw_payload)
 
       ActiveSupport::Notifications.instrument("process_action.action_controller", raw_payload) do |payload|
         result = super
