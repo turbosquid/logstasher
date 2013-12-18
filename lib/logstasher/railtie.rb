@@ -9,6 +9,8 @@ module LogStasher
 
     initializer :logstasher do |app|
       if app.config.logstasher.enabled
+        device = app.config.logstasher.device || STDOUT
+        Rails.logger = LogStasher.logger = LogStasher::JSONLogger.new(device)
         LogStasher.setup(app)
         app.config.middleware.insert_after ActionDispatch::RequestId, LogStasher::Middleware
       end

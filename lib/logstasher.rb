@@ -28,7 +28,6 @@ module LogStasher
     # patch instrumentation class to insert our hook
     require 'logstasher/rails_ext/action_controller/metal/instrumentation'
     LogStasher::RequestLogSubscriber.attach_to :action_controller
-    self.logger = Rails.logger
   end
 
   def self.log(severity, msg)
